@@ -9,7 +9,7 @@ app.use(express.static('dist'))
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/dist/index.html');
 });
-
+app.set('port', port);
 
 const Main = {
     init() {
@@ -20,7 +20,7 @@ const Main = {
     },
     onComplete(data) {
         let cheapData = CoinMarketCap.findCheapCoinsMovingUp(data);
-        fs.writeFile(path.resolve(__dirname, 'dist/data/cheapcoins_1h.json'), JSON.stringify(cheapData, null, 2), (err) => {
+        fs.writeFile( 'dist/data/cheapcoins_1h.json', JSON.stringify(cheapData, null, 2), (err) => {
             if (err) throw err;
             console.log('saved');
             this.next();

@@ -6,12 +6,16 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "cheerio-req": "^1.2.2",
-    "express": "^4.15.2"
+    "express": "^4.15.2",
+    "nodemon": "^1.14.10"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node index.js"
+    "start": "node_modules/.bin/nodemon index.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": "7.6.0"
+  }
 }

@@ -22,9 +22,11 @@ const Main = {
     	data = JSON.parse(data);
     	console.log(data);
         this.populateCheapCoins(data);
+        this.run();
     },
     populateCheapCoins(data){
         let tbody = document.querySelector('tbody');
+        tbody.innerHTML = '';
         data.forEach((item)=>{
                 let row = document.createElement('TR');
                 let class_24h = Number(item.percent_24h.replace('%','')) < 1 ? 'table-danger':  'table-success';
@@ -35,6 +37,11 @@ const Main = {
 
                 tbody.appendChild(row);
         });
+    },
+    run(){
+        setTimeout(()=>{
+            this.loadCheapCoins();
+        },(60000 * 1));
     }
 };
 
