@@ -12,6 +12,7 @@ app.get('/', function(req, res) {
 app.set('port', port);
 
 const Main = {
+    PULL_DELAY:(60000 * 5),
     init() {
         CoinMarketCap.getAllCoins(this.onComplete.bind(this));
         http.listen(port, function() {
@@ -20,16 +21,50 @@ const Main = {
     },
     onComplete(data) {
         let cheapData = CoinMarketCap.findCheapCoinsMovingUp(data);
-        fs.writeFile( 'dist/data/cheapcoins_1h.json', JSON.stringify(cheapData, null, 2), (err) => {
+        this.saveRealtimeChanges(cheapData);
+        fs.writeFile('dist/data/cheapcoins_1h.json', JSON.stringify(cheapData, null, 2), (err) => {
             if (err) throw err;
-            console.log('saved');
+            console.log('saved cheap coins');
             this.next();
+        });
+    },
+    saveRealtimeChanges(data) {
+        let filePath = "dist/data/realtime_changes.json";
+        var content = {};
+        try {
+            content = fs.readFileSync(filePath);
+            content = JSON.parse(content);      
+        } catch (error) {
+
+        }
+        data.forEach((dataItem) => {
+            let item = content[dataItem.symbol];
+            let maxHourCount = 12;
+            if (!item) {
+                item = {
+                    symbol: dataItem.symbol,
+                    name: dataItem.name,
+                    priceHistory: []
+                }
+            }
+            item.priceHistory.unshift({
+                price: dataItem.price,
+                date: Math.floor(Date.now() / 1000)
+            });
+            if(item.priceHistory.length > maxHourCount){
+                item.priceHistory.pop();
+            }
+            content[dataItem.symbol] = item;
+        });
+        fs.writeFile(filePath, JSON.stringify(content, null, 2), (err) => {
+            if (err) throw err;
+            console.log('saved realtime data');
         });
     },
     next() {
         setTimeout(() => {
             CoinMarketCap.getAllCoins(this.onComplete.bind(this));
-        }, (60000 * 5));
+        }, this.PULL_DELAY);
     }
 };
 Main.init();

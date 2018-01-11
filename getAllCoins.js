@@ -1,4 +1,5 @@
 const cheerio = require("cheerio-req");
+const fs = require("fs");
 const CoinMarketCap = {
     getAllCoins(callback) {
         cheerio("https://coinmarketcap.com/all/views/all/", (err, $) => {

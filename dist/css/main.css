@@ -5,3 +5,11 @@
 display: inline-block;
 width:52px;
 }
+.table-success, .table-success>td, .table-success>th {
+  background-color: #05a58d;
+  color: #FFF;
+}
+.table-danger, .table-danger>td, .table-danger>th {
+  background-color: #fd4445;
+  color: #FFF;
+}
