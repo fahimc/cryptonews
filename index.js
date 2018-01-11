@@ -4,7 +4,7 @@ let path = require('path');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 80;
 app.use(express.static('dist'))
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/dist/index.html');
