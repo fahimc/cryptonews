@@ -42,7 +42,6 @@ const Main = {
             var sum = null ;
             realtimeItem.priceHistory.forEach((priceItem)=>{
                 let price = Number(priceItem.price.replace('$',''));
-                console.log(price);
                     if(sum === null)
                     {
                         sum =   price  
@@ -56,6 +55,7 @@ const Main = {
             let currentPrice = Number(item.price.replace('$',''));
             let change = ((Math.abs(averagePrice - currentPrice)/currentPrice) * 100).toFixed(2);
             item.realtimeChange = change + '%';
+            item.recommendation = this.getRecommendation(item.percent_1h,item.percent_24h,item.realtimeChange);
        });     
     },
     populateCheapCoins(data) {
@@ -67,11 +67,27 @@ const Main = {
             let class_7d = Number(item.percent_7d.replace('%', '')) < 0 ? 'table-danger' : 'table-success';
             let class_1h = Number(item.percent_1h.replace('%', '')) < 0 ? 'table-danger' : 'table-success';
             let class_realtime = Number(item.realtimeChange.replace('%', '')) < 0 ? 'table-danger' : 'table-success';
-            let content = `<td>${item.name}</td><td>${item.symbol}</td><td>${item.marketCap}</td><td>${item.volume}</td><td class="${class_1h}">${item.percent_1h}</td><td class="${class_24h}">${item.percent_24h}</td><td class="${class_7d}">${item.percent_7d}</td><td class="${class_realtime}">${item.realtimeChange}</td><td>${item.price}</td><td></td>`;
+            let class_recommendation = item.recommendation === 'STRONG BUY' ? 'table-success' : (item.recommendation === 'BUY' ? 'table-warning' : '');
+            let content = `<td>${item.name}</td><td>${item.symbol}</td><td>${item.marketCap}</td><td>${item.volume}</td><td class="${class_1h}">${item.percent_1h}</td><td class="${class_24h}">${item.percent_24h}</td><td class="${class_7d}">${item.percent_7d}</td><td class="${class_realtime}">${item.realtimeChange}</td><td>${item.price}</td><td class="${class_recommendation}">${item.recommendation}</td>`;
             row.innerHTML = content;
 
             tbody.appendChild(row);
         });
+    },
+    getRecommendation(change1h,change24h,changeRealtime){
+            change1h = Number(change1h.replace('%', ''));
+            change24h = Number(change24h.replace('%', ''));
+            changeRealtime = Number(changeRealtime.replace('%', ''));
+            let type = '';
+            console.log(change24h);
+            if(change24h < change1h && change1h < changeRealtime){
+                    type = 'STRONG BUY';
+            }else if(change24h > 0 && change24h < change1h && change1h > 0 && changeRealtime > 0) {
+                type = 'BUY';
+            }else if(change24h > 0 && change1h > 0 && changeRealtime > 0) {
+                type = 'BUY';
+            }
+            return type;
     },
     run() {
         setTimeout(() => {
