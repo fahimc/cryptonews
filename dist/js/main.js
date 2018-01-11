@@ -17,7 +17,7 @@ const Main = {
     loadFile(url, callback) {
         var xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
-        xobj.open('GET', url, true); 
+        xobj.open('GET', url, true);
         xobj.onreadystatechange = () => {
             if (xobj.readyState == 4 && xobj.status == "200") {
                 if (callback) callback(xobj.responseText);
@@ -36,58 +36,112 @@ const Main = {
         this.cheapCoinData = data;
         this.loadRealtime();
     },
-    mapRealtimeData(data){
-       this.cheapCoinData.forEach((item)=>{
+    mapRealtimeData(data) {
+        this.cheapCoinData.forEach((item) => {
             let realtimeItem = data[item.symbol];
-            var sum = null ;
-            realtimeItem.priceHistory.forEach((priceItem)=>{
-                let price = Number(priceItem.price.replace('$',''));
-                    if(sum === null)
-                    {
-                        sum =   price  
-                    }else{
-                         sum += price;
-                    }
-                   
+            var sum = null;
+            var sumForShort = null;
+            let shortTermChange = [];
+            realtimeItem.priceHistory.forEach((priceItem, index) => {
+                let price = Number(priceItem.price.replace('$', ''));
+                if (sum === null) {
+                    sum = price;
+                    sumForShort = price;
+                } else {
+                    sum += price;
+                }
+                if (index < 4) {
+                    sumForShort += price;
+                    shortTermChange.push(price);
+                }
+
             });
 
-            let averagePrice = sum/realtimeItem.priceHistory.length;
-            let currentPrice = Number(item.price.replace('$',''));
-            let change = ((Math.abs(averagePrice - currentPrice)/currentPrice) * 100).toFixed(2);
+            let averagePrice = sum / realtimeItem.priceHistory.length;
+            let currentPrice = Number(item.price.replace('$', ''));
+            let change = ((Math.abs(averagePrice - currentPrice) / currentPrice) * 100).toFixed(2);
             item.realtimeChange = change + '%';
-            item.recommendation = this.getRecommendation(item.percent_1h,item.percent_24h,item.realtimeChange);
-       });     
+            item.change15Mins = this.get15minChange(sumForShort, shortTermChange);
+            item.direction15Mins = this.get15minDirection(shortTermChange);
+            item.recommendation = this.getRecommendation(item.direction15Mins, item.change15Mins, item.realtimeChange);
+        });
     },
     populateCheapCoins(data) {
         let tbody = document.querySelector('tbody');
         tbody.innerHTML = '';
+        this.sortBy15mins(data);
         data.forEach((item) => {
             let row = document.createElement('TR');
-            let class_24h = Number(item.percent_24h.replace('%', '')) < 0 ? 'table-danger' : 'table-success';
-            let class_7d = Number(item.percent_7d.replace('%', '')) < 0 ? 'table-danger' : 'table-success';
-            let class_1h = Number(item.percent_1h.replace('%', '')) < 0 ? 'table-danger' : 'table-success';
-            let class_realtime = Number(item.realtimeChange.replace('%', '')) < 0 ? 'table-danger' : 'table-success';
+            let class_24h = this.getPercentageCellColor(item.percent_24h);
+            let class_1h = this.getPercentageCellColor(item.percent_1h);
+            let class_7d = this.getPercentageCellColor(item.percent_7d);
+            let class_realtime = this.getPercentageCellColor(item.realtimeChange);
+            let class_realtime_15m = this.getPercentageCellColor(item.change15Mins);
             let class_recommendation = item.recommendation === 'STRONG BUY' ? 'table-success' : (item.recommendation === 'BUY' ? 'table-warning' : '');
-            let content = `<td>${item.name}</td><td>${item.symbol}</td><td>${item.marketCap}</td><td>${item.volume}</td><td class="${class_1h}">${item.percent_1h}</td><td class="${class_24h}">${item.percent_24h}</td><td class="${class_7d}">${item.percent_7d}</td><td class="${class_realtime}">${item.realtimeChange}</td><td>${item.price}</td><td class="${class_recommendation}">${item.recommendation}</td>`;
+            let class_direction = item.direction15Mins === 'RAISE' ? 'table-success' : (item.recommendation === 'FALL' ? 'table-warning' : '');
+            let content = `<td>${item.name}</td>
+            <td>${item.symbol}</td>
+            <td>${item.marketCap}</td>
+            <td>${item.volume}</td>
+            <td class="${class_1h}">${item.percent_1h}</td>
+            <td class="${class_24h}">${item.percent_24h}</td>
+            <td class="${class_7d}">${item.percent_7d}</td>
+            <td class="${class_realtime}">${item.realtimeChange}</td>
+            <td class="${class_realtime_15m}">${item.change15Mins}</td>
+            <td class="${class_direction}">${item.direction15Mins}</td>
+            <td>${item.price}</td>
+            <td class="${class_recommendation}">${item.recommendation}</td>`;
             row.innerHTML = content;
 
             tbody.appendChild(row);
         });
     },
-    getRecommendation(change1h,change24h,changeRealtime){
-            change1h = Number(change1h.replace('%', ''));
-            change24h = Number(change24h.replace('%', ''));
-            changeRealtime = Number(changeRealtime.replace('%', ''));
-            let type = '';
-            console.log(change24h);
-            if(change24h < change1h && change1h < changeRealtime){
-                    type = 'STRONG BUY';
-            }else if(change24h > 0 && change24h < change1h && change1h > 0 && changeRealtime > 0) {
-                type = 'BUY';
-            }else if(change24h > 0 && change1h > 0 && changeRealtime > 0) {
-                type = 'BUY';
-            }
-            return type;
+    replaceSign(price,sign) {
+        if(!sign)sign= '%';
+        return Number(price.replace('%', ''));
+    },
+    getPercentageCellColor(num) {
+        return this.replaceSign(num) < 0 ? 'table-danger' : (this.replaceSign(num) > 0 ? 'table-success' : '');
+    },
+    get15minChange(sum, collection) {
+        let currentPrice = collection[0];
+        let averagePrice = sum / collection.length;
+        let change = 0;
+        if (collection.length > 2) change = ((Math.abs(averagePrice - currentPrice) / currentPrice) * 100).toFixed(2);
+        return change + '%';
+    },
+    get15minDirection(collection) {
+        collection.reverse();
+        let direction = 'NO CHANGE';
+        let raise = 0;
+        let falls = 0;
+        let previousPrice = collection[0];
+        collection.forEach((price) => {
+            if (previousPrice > price) falls++;
+            if (previousPrice < price) raise++;
+            previousPrice = price;
+        });
+        if (raise > falls) direction = 'RAISE';
+        if (raise < falls) direction = 'FALL';
+        return direction;
+    },
+    sortBy15mins(data) {
+        data.sort((itemA,itemB) => {
+                return (this.replaceSign(itemB.change15Mins) && itemB.direction15Mins === 'RAISE') - (this.replaceSign(itemA.change15Mins) && itemA.direction15Mins === 'RAISE');
+        });
+    },
+    getRecommendation(direction, change15Mins, changeRealtime) {
+        change15Mins =  this.replaceSign(change15Mins);
+        changeRealtime = this.replaceSign(changeRealtime);
+        let type = '';
+        if (changeRealtime && change15Mins && direction === 'RAISE') {
+            type = 'STRONG BUY';
+        } else if (changeRealtime && change15Mins && direction === 'NO CHANGE') {
+            type = 'BUY';
+        } else if (change15Mins && (direction === 'NO CHANGE' || direction === 'RAISE' )) {
+            type = 'BUY';
+        }
+        return type;
     },
     run() {
         setTimeout(() => {
