@@ -13,3 +13,8 @@ width:52px;
   background-color: #fd4445;
   color: #FFF;
 }
+.table-warning, .table-warning>td, .table-warning>th {
+  background-color: #e67e22;
+  color: #FFF;
+}
+

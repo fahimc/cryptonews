@@ -9,6 +9,7 @@ const CoinMarketCap = {
                 let symbol = $(elem).find('.currency-symbol a').text();
                 if (!symbol) return;
                 let name = $(elem).find('.currency-name-container').text();
+                let link = $(elem).find('.currency-name-container').attr('href');
                 let marketCap = $(elem).find('.market-cap').text().replace(/\n/g, '').trim();
                 let price = $(elem).find('.price').text();
                 let volume = $(elem).find('.volume').text();
@@ -23,7 +24,8 @@ const CoinMarketCap = {
                     volume,
                     percent_1h,
                     percent_24h,
-                    percent_7d
+                    percent_7d,
+                    link: link
                 };
                 data.push(item);
             });

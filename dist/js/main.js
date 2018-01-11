@@ -78,8 +78,8 @@ const Main = {
             let class_realtime = this.getPercentageCellColor(item.realtimeChange);
             let class_realtime_15m = this.getPercentageCellColor(item.change15Mins);
             let class_recommendation = item.recommendation === 'STRONG BUY' ? 'table-success' : (item.recommendation === 'BUY' ? 'table-warning' : '');
-            let class_direction = item.direction15Mins === 'RAISE' ? 'table-success' : (item.recommendation === 'FALL' ? 'table-warning' : '');
-            let content = `<td>${item.name}</td>
+            let class_direction = item.direction15Mins === 'RAISE' ? 'table-success' : (item.direction15Mins === 'FALL' ? 'table-danger' : '');
+            let content = `<td><a href="https://coinmarketcap.com/${item.link}" target="_blank" >${item.name}</a></td>
             <td>${item.symbol}</td>
             <td>${item.marketCap}</td>
             <td>${item.volume}</td>
