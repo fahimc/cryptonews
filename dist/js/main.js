@@ -36,8 +36,9 @@ const Main = {
     onRealtimeComplete(data) {
         data = JSON.parse(data);
         this.mapRealtimeData(data);
+        this.populateCheapCoins(this.cheapCoinData);
+        RecommendationController.populate();
         if (!this.currentPage) {
-            this.populateCheapCoins(this.cheapCoinData);
             this.showPage();
         }
 
@@ -49,28 +50,34 @@ const Main = {
         this.loadRealtime();
     },
     onRecommendationClicked() {
-        if(!this.cheapCoinData)return;
+        if (!this.cheapCoinData) return;
         RecommendationController.populate();
         this.showPage('recommendation');
     },
     showPage(name) {
         switch (this.currentPage) {
             case 'main':
-                document.querySelector('[page=main]').classList.add('hide');
-                this.currentPage = 'recommendation';
-                this.populateCheapCoins(this.cheapCoinData);
-                document.querySelector('[page=recommendation]').classList.remove('hide');
-                break;
+            if (name == 'main') return;
+            document.querySelector('[page=main]').classList.add('hide');
+            this.currentPage = 'recommendation';
+            this.populateCheapCoins(this.cheapCoinData);
+            document.querySelector('[page=recommendation]').classList.remove('hide');
+            document.querySelector('#main-button').parentNode.classList.remove('active');
+            document.querySelector('#rec-button').parentNode.classList.add('active');
+            break;
             case 'recommendation':
-                document.querySelector('[page=recommendation]').classList.add('hide');
-                this.currentPage = 'main';
-                document.querySelector('[page=main]').classList.remove('hide');
-                RecommendationController.destroy();
-                break;
-            default:
-                this.currentPage = 'main';
-                document.querySelector('[page=main]').classList.remove('hide');
-                break;
+            if (name == 'recommendation') return;
+            document.querySelector('[page=recommendation]').classList.add('hide');
+            this.currentPage = 'main';
+            document.querySelector('[page=main]').classList.remove('hide');
+            document.querySelector('#main-button').parentNode.classList.add('active');
+            document.querySelector('#rec-button').parentNode.classList.remove('active');
+            RecommendationController.destroy();
+            break;
+            case '':
+            this.currentPage = 'main';
+            document.querySelector('[page=main]').classList.remove('hide');
+            break;
         }
     },
     mapRealtimeData(data) {
@@ -133,6 +140,7 @@ const Main = {
 
             tbody.appendChild(row);
         });
+        document.querySelector('#coins_date').textContent = new Date();
     },
     replaceSign(price, sign) {
         if (!sign) sign = '%';
@@ -172,14 +180,20 @@ const Main = {
         change15Mins = this.replaceSign(change15Mins);
         changeRealtime = this.replaceSign(changeRealtime);
         let type = '';
-        if (changeRealtime && change15Mins && direction === 'RAISE') {
+        if (RecommendationController.bestChange15 && this.between(changeRealtime,RecommendationController.bestChange1h) && this.between(change15Mins,RecommendationController.bestChange15) && direction === 'RAISE') {
             type = 'STRONG BUY';
+        } else if (!RecommendationController.bestChange15 && this.between(changeRealtime,5) && this.between(change15Mins,25) && direction === 'RAISE') {
+            type = 'STRONG BUY';
+        } else if (changeRealtime && change15Mins && direction === 'RAISE') {
+            type = 'BUY';
         } else if (changeRealtime && change15Mins && direction === 'NO CHANGE') {
             type = 'BUY';
         } else if (change15Mins && (direction === 'NO CHANGE' || direction === 'RAISE')) {
-            type = 'BUY';
         }
         return type;
+    },
+    between(x, z) {
+        return x >= (z - 5) && x <= (z + 5);
     },
     run() {
         setTimeout(() => {

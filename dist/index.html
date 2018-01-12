@@ -72,6 +72,7 @@
                 <p class="lead">Sorted by the percentage change in the last 15 minutes.
                     <br>Search <a href="www.coinmarketcap.com" target="_blank" class="text-white">www.coinmarketcap.com</a> for the exchanges and stats.</p>
                 <p>Content up update <strong>every</strong> minute.</p>
+                <h6 class="card-subtitle mb-2 text-light">Last Updated <span id="coins_date"></span></h6>
             </div>
         </div>
         <div class="table-responsive">
@@ -104,40 +105,37 @@
                 <p class="lead">This is done on your device or browser so leave it running to see the results increment.</p>
             </div>
         </div>
-        <div class="card bg-warning text-white" id="stats-container">
+        <div class="card bg-dark text-white" id="stats-container">
             <div class="card-body">
                 <h1 class="display-8">Stats</h1>
-                <button type="button" class="btn btn-primary">
+                <h6 class="card-subtitle mb-2 text-light">Last Updated <span id="rec_date"></span></h6>
+                <button type="button" class="btn btn-success">
                     Number of Profitable Predictions <span class="badge badge-light" id="profitable_predictions"></span>
                 </button>
                 <button type="button" class="btn btn-danger">
                     Number of Failed Predictions <span class="badge badge-light" id="failed_predictions"></span>
+                </button><br>
+                <button type="button" class="btn btn-info">
+                    Best Average Change (15m)<span class="badge badge-light" id="best_average"></span>
+                </button>
+                 <button type="button" class="btn btn-info">
+                    Best Average Change (1h)<span class="badge badge-light" id="best_average_1h"></span>
                 </button>
             </div>
         </div>
         <div id="recommendation-card-container">
-            <div class="row">
-                <div class="col">
-                    <div class="card text-white bg-dark ">
-                        <div class="card-body">
-                            <h5 class="card-title">Special title treatment</h5>
-                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card text-white bg-dark ">
-                        <div class="card-body">
-                            <h5 class="card-title">Special title treatment</h5>
-                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-112382612-1"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-112382612-1');
+    </script>
 </body>
 
 </html>
