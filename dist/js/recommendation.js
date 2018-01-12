@@ -86,10 +86,11 @@ const RecommendationController = window.RecommendationController = {
             } else if (currentProfit < 0) {
                 this.failures++;
             }
+            let ended = Main.findCoinInData(item.symbol) ? '' : '<span class="badge badge-danger">ENDED</span>';
             let template = `<div class="col">
                     <div class="card text-white bg-dark ">
                         <div class="card-body">
-                            <h5 class="card-title">${item.name} <span class="badge badge-secondary badge-light">${item.symbol}</span></h5>
+                            <h5 class="card-title"><a class="text-white" href="//coinmarketcap.com/${item.link}" target="_blank">${item.name}</a> <span class="badge badge-secondary badge-light">${item.symbol}</span> ${ended}</h5>
                             <small class="card-subtitle mb-2 text-muted">Created at ${new Date(item.initialData.timestamp)}</small>
                             <div class="container-fluid">
                                 <button type="button" class="btn btn-primary">
@@ -124,6 +125,7 @@ const RecommendationController = window.RecommendationController = {
         sortByDate() {
             let collection = [];
             for (let key in this.data) {
+
                 collection.push(this.data[key]);
             }
             collection.sort(function(a, b) {
@@ -132,14 +134,23 @@ const RecommendationController = window.RecommendationController = {
             return collection;
         },
         sortByHighest() {
+            let endedcollection = [];
             let collection = [];
             for (let key in this.data) {
-                collection.push(this.data[key]);
+                let found = Main.findCoinInData(this.data[key].symbol)
+                if(found){
+                  collection.push(this.data[key]);
+                }else{
+                  endedcollection.push(this.data[key]);
+                }
             }
             collection.sort(function(a, b) {
                 return b.highestProfit - a.highestProfit;
             });
-            return collection;
+            endedcollection.sort(function(a, b) {
+                return b.highestProfit - a.highestProfit;
+            });
+            return collection.concat(endedcollection);
         },
         populate() {
             this.success = 0;

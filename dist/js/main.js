@@ -9,6 +9,7 @@ const Main = {
         this.addListener();
         RecommendationController.init();
         this.loadCheapCoins();
+        //this.loadUSD();
     },
     addListener() {
         document.querySelector('#rec-button').addEventListener('click', this.onRecommendationClicked.bind(this));
@@ -21,6 +22,10 @@ const Main = {
     loadRealtime() {
         var file = 'data/realtime_changes.json';
         this.loadFile(file, this.onRealtimeComplete.bind(this));
+    },
+    loadUSD() {
+        var file = '//api.coindesk.com/v1/bpi/currentprice.json';
+        this.loadFile(file, this.onConvertComplete.bind(this));
     },
     loadFile(url, callback) {
         var xobj = new XMLHttpRequest();
@@ -37,6 +42,9 @@ const Main = {
             this.loadCheapCoins();
         }
 
+    },
+    onConvertComplete(data) {
+        console.log(data);
     },
     onRealtimeComplete(data) {
         try {
@@ -55,7 +63,12 @@ const Main = {
         this.run();
     },
     onCheapCoinsLoaded(data) {
-        data = JSON.parse(data);
+        try {
+            data = JSON.parse(data);
+        } catch (e) {
+            this.loadCheapCoins();
+            return;
+        }
         this.cheapCoinData = data;
         this.loadRealtime();
     },
@@ -134,7 +147,7 @@ const Main = {
             let class_realtime_15m = this.getPercentageCellColor(item.change15Mins);
             let class_recommendation = item.recommendation === 'STRONG BUY' ? 'table-success' : (item.recommendation === 'BUY' ? 'table-warning' : '');
             let class_direction = item.direction15Mins === 'RAISE' ? 'table-success' : (item.direction15Mins === 'FALL' ? 'table-danger' : '');
-            let content = `<td><a href="https://coinmarketcap.com/${item.link}" target="_blank" >${item.name}</a></td>
+            let content = `<td><a href="//coinmarketcap.com/${item.link}" target="_blank" >${item.name}</a></td>
             <td>${item.symbol}</td>
             <td>${item.marketCap}</td>
             <td>${item.volume}</td>
@@ -151,6 +164,13 @@ const Main = {
             tbody.appendChild(row);
         });
         document.querySelector('#coins_date').textContent = new Date();
+    },
+    findCoinInData(symbol){
+        let obj;
+        this.cheapCoinData.forEach((item) => {
+            if(item.symbol == symbol)obj=item;
+        });
+        return obj;
     },
     replaceSign(price, sign) {
         if (!sign) sign = '%';
