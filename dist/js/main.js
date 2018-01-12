@@ -1,10 +1,18 @@
 const Main = {
+    version: 1,
     cheapCoinData: null,
+    currentPage: '',
     init() {
         document.addEventListener('DOMContentLoaded', this.onLoaded.bind(this));
     },
     onLoaded() {
+        this.addListener();
+        RecommendationController.init();
         this.loadCheapCoins();
+    },
+    addListener() {
+        document.querySelector('#rec-button').addEventListener('click', this.onRecommendationClicked.bind(this));
+        document.querySelector('#main-button').addEventListener('click', this.showPage.bind(this, 'main'));
     },
     loadCheapCoins() {
         var file = 'data/cheapcoins_1h.json';
@@ -28,13 +36,42 @@ const Main = {
     onRealtimeComplete(data) {
         data = JSON.parse(data);
         this.mapRealtimeData(data);
-        this.populateCheapCoins(this.cheapCoinData);
+        if (!this.currentPage) {
+            this.populateCheapCoins(this.cheapCoinData);
+            this.showPage();
+        }
+
         this.run();
     },
     onCheapCoinsLoaded(data) {
         data = JSON.parse(data);
         this.cheapCoinData = data;
         this.loadRealtime();
+    },
+    onRecommendationClicked() {
+        if(!this.cheapCoinData)return;
+        RecommendationController.populate();
+        this.showPage('recommendation');
+    },
+    showPage(name) {
+        switch (this.currentPage) {
+            case 'main':
+                document.querySelector('[page=main]').classList.add('hide');
+                this.currentPage = 'recommendation';
+                this.populateCheapCoins(this.cheapCoinData);
+                document.querySelector('[page=recommendation]').classList.remove('hide');
+                break;
+            case 'recommendation':
+                document.querySelector('[page=recommendation]').classList.add('hide');
+                this.currentPage = 'main';
+                document.querySelector('[page=main]').classList.remove('hide');
+                RecommendationController.destroy();
+                break;
+            default:
+                this.currentPage = 'main';
+                document.querySelector('[page=main]').classList.remove('hide');
+                break;
+        }
     },
     mapRealtimeData(data) {
         this.cheapCoinData.forEach((item) => {
@@ -64,6 +101,7 @@ const Main = {
             item.change15Mins = this.get15minChange(sumForShort, shortTermChange);
             item.direction15Mins = this.get15minDirection(shortTermChange);
             item.recommendation = this.getRecommendation(item.direction15Mins, item.change15Mins, item.realtimeChange);
+            if (item.recommendation === (RecommendationController.TYPE.STRONG_BUY || RecommendationController.TYPE.BUY)) RecommendationController.addRecommendations(item, item.realtimeChange, item.change15Mins, item.recommendation);
         });
     },
     populateCheapCoins(data) {
@@ -96,8 +134,8 @@ const Main = {
             tbody.appendChild(row);
         });
     },
-    replaceSign(price,sign) {
-        if(!sign)sign= '%';
+    replaceSign(price, sign) {
+        if (!sign) sign = '%';
         return Number(price.replace('%', ''));
     },
     getPercentageCellColor(num) {
@@ -126,19 +164,19 @@ const Main = {
         return direction;
     },
     sortBy15mins(data) {
-        data.sort((itemA,itemB) => {
-                return (this.replaceSign(itemB.change15Mins) && itemB.direction15Mins === 'RAISE') - (this.replaceSign(itemA.change15Mins) && itemA.direction15Mins === 'RAISE');
+        data.sort((itemA, itemB) => {
+            return (this.replaceSign(itemB.change15Mins) && itemB.direction15Mins === 'RAISE') - (this.replaceSign(itemA.change15Mins) && itemA.direction15Mins === 'RAISE');
         });
     },
     getRecommendation(direction, change15Mins, changeRealtime) {
-        change15Mins =  this.replaceSign(change15Mins);
+        change15Mins = this.replaceSign(change15Mins);
         changeRealtime = this.replaceSign(changeRealtime);
         let type = '';
         if (changeRealtime && change15Mins && direction === 'RAISE') {
             type = 'STRONG BUY';
         } else if (changeRealtime && change15Mins && direction === 'NO CHANGE') {
             type = 'BUY';
-        } else if (change15Mins && (direction === 'NO CHANGE' || direction === 'RAISE' )) {
+        } else if (change15Mins && (direction === 'NO CHANGE' || direction === 'RAISE')) {
             type = 'BUY';
         }
         return type;

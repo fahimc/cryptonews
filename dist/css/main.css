@@ -20,3 +20,10 @@ width:52px;
   color: #FFF;
 }
 
+[page].hide{
+display:  none;
+}
+
+[page=recommendation] .card button, [page=recommendation] .card .btn {
+  margin-top: 5px;
+}
