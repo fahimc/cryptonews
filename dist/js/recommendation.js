@@ -74,7 +74,7 @@ const RecommendationController = window.RecommendationController = {
             return profit;
         },
         getTemplate(item) {
-            let highestProfit = this.getHighestProfit(item);
+            let highestProfit = item.highestProfit = this.getHighestProfit(item);
             if (!item.priceHistory[item.priceHistory.length - 1]) return '';
             let currentPrice = item.priceHistory[item.priceHistory.length - 1].price;
             let currentProfit = (((this.replaceSign(currentPrice, '$') - this.replaceSign(item.initialData.price, '$')) / this.replaceSign(item.initialData.price, '$')) * 100).toFixed(2);
@@ -131,6 +131,16 @@ const RecommendationController = window.RecommendationController = {
             });
             return collection;
         },
+        sortByHighest() {
+            let collection = [];
+            for (let key in this.data) {
+                collection.push(this.data[key]);
+            }
+            collection.sort(function(a, b) {
+                return b.highestProfit - a.highestProfit;
+            });
+            return collection;
+        },
         populate() {
             this.success = 0;
             this.failures = 0;
@@ -138,7 +148,7 @@ const RecommendationController = window.RecommendationController = {
             let container = document.querySelector('#recommendation-card-container');
             container.innerHTML = '';
             let html = '';
-            let collection = this.sortByDate();
+            let collection = this.sortByHighest();
             collection.forEach((item) => {
                 html += this.getTemplate(item);
             });
