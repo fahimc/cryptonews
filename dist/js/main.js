@@ -78,6 +78,7 @@ const Main = {
         this.showPage('recommendation');
     },
     showPage(name) {
+        $('.navbar-collapse').collapse('hide');
         switch (this.currentPage) {
             case 'main':
                 if (name == 'main') return;
@@ -147,7 +148,7 @@ const Main = {
             let class_realtime_15m = this.getPercentageCellColor(item.change15Mins);
             let class_recommendation = item.recommendation === 'STRONG BUY' ? 'table-success' : (item.recommendation === 'BUY' ? 'table-warning' : '');
             let class_direction = item.direction15Mins === 'RAISE' ? 'table-success' : (item.direction15Mins === 'FALL' ? 'table-danger' : '');
-            let content = `<td><a href="//coinmarketcap.com/${item.link}" target="_blank" >${item.name}</a></td>
+            let content = `<td><a class="text-white" href="//coinmarketcap.com/${item.link}" target="_blank" >${item.name}</a></td>
             <td>${item.symbol}</td>
             <td>${item.marketCap}</td>
             <td>${item.volume}</td>
@@ -163,6 +164,7 @@ const Main = {
 
             tbody.appendChild(row);
         });
+        document.querySelector('#loading').classList.add('hide');
         document.querySelector('#coins_date').textContent = new Date();
     },
     findCoinInData(symbol){

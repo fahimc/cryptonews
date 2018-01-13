@@ -68,7 +68,7 @@
     <div class="container-fluid hide" page="main">
         <div class="card bg-dark text-white" style="background: url(image/hero.png) center center;text-shadow: 1px 1px 2px black; ">
             <div class="card-body">
-                <h1 class="display-6">Crypto Trade Recommendation</h1>
+                <h1 class="display-6">Crypto Trade Recommendations</h1>
                 <p class="lead">Sorted by reccommendation and a positive percentage change within the last 15 minutes.
                     <br>Search <a href="www.coinmarketcap.com" target="_blank" class="text-white">www.coinmarketcap.com</a> for the exchanges and stats.</p>
                 <p>Content up update <strong>every</strong> minute.</p>
@@ -112,7 +112,7 @@
                 <div class="card text-white bg-secondary border-0">
                     <div class="card-header bg-primary ">Analysis</div>
                     <div class="card-body">
-                        <p >You need to wait while it collects data to give the best data. 10 - 15 minutes</p>
+                        <p>You need to wait while it collects data to give the best data. 10 - 15 minutes</p>
                         <button type="button" class="btn btn-success">
                             Profitable Predictions <span class="badge badge-light" id="profitable_predictions"></span>
                         </button>
@@ -120,11 +120,12 @@
                             Failed Predictions <span class="badge badge-light" id="failed_predictions"></span>
                         </button>
                     </div>
-                </div><br>
+                </div>
+                <br>
                 <div class="card text-white bg-secondary border-0">
                     <div class="card-header bg-primary ">Prediction Model</div>
                     <div class="card-body">
-                        <p >Best average on successful predictions is based on Coins reaching 10% price increase. You need to wait while it collects data to give the best data.</p>
+                        <p>Best average on successful predictions is based on Coins reaching 10% price increase. You need to wait while it collects data to give the best data.</p>
                         <button type="button" class="btn btn-info">
                             Average Change (15m) <span class="badge badge-light" id="best_average"></span>
                         </button>
@@ -136,6 +137,16 @@
             </div>
         </div>
         <div id="recommendation-card-container">
+        </div>
+    </div>
+    <div id="loading">
+        <div class="spinner">
+                <div class="rect1"></div>
+                <div class="rect2"></div>
+                <div class="rect3"></div>
+                <div class="rect4"></div>
+                <div class="rect5"></div>
+            </div>
         </div>
     </div>
     <!-- Global site tag (gtag.js) - Google Analytics -->

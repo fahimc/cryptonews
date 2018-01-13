@@ -41,7 +41,7 @@ const RecommendationController = window.RecommendationController = {
                 this.data[item.symbol].initialData = obj;
                 this.data[item.symbol].timestamp = new Date().getTime();
             }
-            if (this.ObjectSize(this.data) > 1000) this.resizeObject(this.data, 1000);
+            this.data = this.resizeObject(this.data, 1000);
             localStorage.setItem(this.DATA_NAME, JSON.stringify(this.data));
         },
         ObjectSize(obj) {
@@ -55,11 +55,12 @@ const RecommendationController = window.RecommendationController = {
         resizeObject(obj, limit) {
             let datetime = new Date().getTime();
             for (key in obj) {
-                if ((datetime - obj[key].timestamp) >= 9000000) {
+                if (Math.abs(datetime - obj[key].timestamp) >= 4000000) {
                     console.log('deleted recommendation');
                     delete obj[key];
                 }
             }
+            return obj;
         },
         replaceSign(price, sign) {
             if (!sign) sign = '%';
