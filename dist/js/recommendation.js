@@ -5,11 +5,14 @@ const RecommendationController = window.RecommendationController = {
             STRONG_BUY: 'STRONG BUY',
             BUY: 'BUY'
         },
+        SAVE_BEST_CHANGE:'SAVE_BEST_CHANGE',
         data: null,
         success: 0,
         failures: 0,
         above10profitCollection: [],
         bestChange15: 0,
+        bestChange24: 0,
+        bestChange7: 0,
         bestChange1h: 0,
         init() {
             this.data = localStorage.getItem(this.DATA_NAME);
@@ -24,24 +27,35 @@ const RecommendationController = window.RecommendationController = {
                 localStorage.setItem(this.DATA_NAME, JSON.stringify(this.data));
                 localStorage.setItem(this.APP_VERSION, Main.version);
             }
+            let best = localStorage.getItem(this.SAVE_BEST_CHANGE);
+            if(best){
+              best = JSON.parse(best);
+              this.bestChange15 = best.bestChange15;
+              this.bestChange1h = best.bestChange1h;
+              this.bestChange7 = best.bestChange7;
+              this.bestChange24 = best.bestChange24;
+            }
         },
         addRecommendations(item, realtimeChange, change15Mins, recommendation) {
             let obj = {
                 realtimeChange: realtimeChange,
                 change15Mins: change15Mins,
                 recommendation: recommendation,
+                change_24h: item.percent_24h,
+                change_7d: item.percent_7d,
                 price: item.price,
                 timestamp: new Date().getTime()
             };
-            if (this.data[item.symbol]) {
-                this.data[item.symbol].priceHistory.push(obj);
+            let key = Main.getlastpartOfLink(item.link);
+            if (this.data[key]) {
+                this.data[key].priceHistory.push(obj);
             } else {
-                this.data[item.symbol] = item;
-                this.data[item.symbol].priceHistory = [obj];
-                this.data[item.symbol].initialData = obj;
-                this.data[item.symbol].timestamp = new Date().getTime();
+                this.data[key] = item;
+                this.data[key].priceHistory = [obj];
+                this.data[key].initialData = obj;
+                this.data[key].timestamp = new Date().getTime();
             }
-            this.data = this.resizeObject(this.data, 1000);
+            this.data = this.resizeObject(this.data, 100);
             localStorage.setItem(this.DATA_NAME, JSON.stringify(this.data));
         },
         ObjectSize(obj) {
@@ -53,12 +67,14 @@ const RecommendationController = window.RecommendationController = {
             return size;
         },
         resizeObject(obj, limit) {
+          let count=0;
             let datetime = new Date().getTime();
             for (key in obj) {
-                if (Math.abs(datetime - obj[key].timestamp) >= 4000000) {
-                    console.log('deleted recommendation');
+                if (Math.abs(datetime - obj[key].timestamp) >= 4000000||count>=limit) {
+                    //console.log('deleted recommendation');
                     delete obj[key];
                 }
+                count++;
             }
             return obj;
         },
@@ -81,12 +97,13 @@ const RecommendationController = window.RecommendationController = {
             let currentProfit = (((this.replaceSign(currentPrice, '$') - this.replaceSign(item.initialData.price, '$')) / this.replaceSign(item.initialData.price, '$')) * 100).toFixed(2);
             let classProfit = currentProfit > 0 ? 'btn-success' : (currentProfit < 0 ? 'btn-danger' : 'btn-secondary');
             let classHighestProfit = highestProfit > 0 ? 'btn-success' : 'btn-secondary';
-            if (highestProfit > 0) {
+            if (highestProfit > 10) this.above10profitCollection.push({ highestProfit: highestProfit, change15Mins: item.initialData.change15Mins, realtimeChange: item.initialData.realtimeChange, initialData: item.initialData });
+            if (highestProfit > 0 && item.initialData.recommendation) {
                 this.success++;
-                if (highestProfit > 10) this.above10profitCollection.push({ highestProfit: highestProfit, change15Mins: item.initialData.change15Mins, realtimeChange: item.initialData.realtimeChange });
-            } else if (currentProfit < 0) {
+            } else if (currentProfit < 0 && item.initialData.recommendation) {
                 this.failures++;
             }
+            
             let ended = Main.findCoinInData(item.symbol) ? '' : '<span class="badge badge-danger">ENDED</span>';
             let template = `<div class="col">
                     <div class="card text-white bg-dark ">
@@ -102,6 +119,12 @@ const RecommendationController = window.RecommendationController = {
                                 </button>
                                 <button type="button" class="btn btn-primary">
                                     <small>Initial Recommendation</small> <span class="badge badge-light">${item.initialData.recommendation}</span>
+                                </button>
+                                <button type="button" class="btn btn-primary">
+                                    <small>Initial Change (24h)</small> <span class="badge badge-light">${item.initialData.change_24h}</span>
+                                </button>
+                                <button type="button" class="btn btn-primary">
+                                    <small>Initial  Change (7d)</small> <span class="badge badge-light">${item.initialData.change_7d}</span>
                                 </button>
                                  <button type="button" class="btn btn-primary">
                                     <small>Initial Price</small> <span class="badge badge-light">${item.initialData.price}</span>
@@ -168,26 +191,44 @@ const RecommendationController = window.RecommendationController = {
 
         container.innerHTML = html;
         let bestChange = this.calculateBestChange();
-        this.bestChange15 = bestChange.average15mins;
         this.bestChange1h = bestChange.average1h;
+        this.bestChange15 = bestChange.average15mins;
+        this.bestChange24 = bestChange.average24h;
+        this.bestChange7 = bestChange.average7d;
+        localStorage.setItem(this.SAVE_BEST_CHANGE,JSON.stringify({
+          bestChange1h:this.bestChange1h,
+          bestChange15:this.bestChange15,
+          bestChange24:this.bestChange24,
+          bestChange7:this.bestChange7
+        }));
         document.querySelector('#profitable_predictions').textContent = ((this.success / total) * 100).toFixed(2) + '%';
         document.querySelector('#failed_predictions').textContent = ((this.failures / total) * 100).toFixed(2) + '%';
         document.querySelector('#best_average').textContent = bestChange.average15mins.toFixed(2) + '%';
         document.querySelector('#best_average_1h').textContent = bestChange.average1h.toFixed(2) + '%';
+        document.querySelector('#best_average_24h').textContent = bestChange.average24h.toFixed(2) + '%';
+        document.querySelector('#best_average_7d').textContent = bestChange.average7d.toFixed(2) + '%';
         document.querySelector('#rec_date').textContent = new Date();
     },
     calculateBestChange() {
         let sum15min = 0;
         let sum1h = 0;
+        let sum24h = 0;
+        let sum7d = 0;
         this.above10profitCollection.forEach((item) => {
             sum15min += this.replaceSign(item.change15Mins);
             sum1h += this.replaceSign(item.realtimeChange);
+            sum24h += this.replaceSign(item.initialData.change_24h);
+            sum7d += this.replaceSign(item.initialData.change_7d);
         });
         let average15mins = this.above10profitCollection.length ? sum15min / this.above10profitCollection.length : 0;
         let average1h = this.above10profitCollection.length ? sum1h / this.above10profitCollection.length : 0;
+        let average24h = this.above10profitCollection.length ? sum24h / this.above10profitCollection.length : 0;
+        let average7d = this.above10profitCollection.length ? sum7d / this.above10profitCollection.length : 0;
         return {
             average15mins,
-            average1h
+            average1h,
+            average24h,
+            average7d
         };
     },
     destroy() {

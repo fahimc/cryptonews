@@ -1,7 +1,10 @@
 const Main = {
-    version: 1.1,
+    version: 1.36,
     cheapCoinData: null,
     currentPage: '',
+    currencies:{
+        BTC:0
+    },
     init() {
         document.addEventListener('DOMContentLoaded', this.onLoaded.bind(this));
     },
@@ -14,6 +17,13 @@ const Main = {
     addListener() {
         document.querySelector('#rec-button').addEventListener('click', this.onRecommendationClicked.bind(this));
         document.querySelector('#main-button').addEventListener('click', this.showPage.bind(this, 'main'));
+        $('#currency-model').on('shown.bs.modal', ()=> {
+            document.querySelector('#loading').classList.remove('hide');
+            this.loadFile('data/coin/bitcoin.json',this.onCurrencyComplete.bind(this),true);
+        });
+        document.querySelector('#btc-input').addEventListener('keyup', this.onCurrencyKeyUp.bind(this));
+        document.querySelector('#usd-input').addEventListener('keyup', this.onCurrencyKeyUp.bind(this));
+
     },
     loadCheapCoins() {
         var file = 'data/cheapcoins_1h.json';
@@ -27,7 +37,7 @@ const Main = {
         var file = '//api.coindesk.com/v1/bpi/currentprice.json';
         this.loadFile(file, this.onConvertComplete.bind(this));
     },
-    loadFile(url, callback) {
+    loadFile(url, callback,ignoreRetry) {
         var xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
         xobj.open('GET', url, true);
@@ -39,12 +49,31 @@ const Main = {
         try {
             xobj.send(null);
         } catch (e) {
-            this.loadCheapCoins();
+            if(!ignoreRetry)this.loadCheapCoins();
         }
 
     },
-    onConvertComplete(data) {
-        console.log(data);
+    onCurrencyKeyUp(event){
+        let btcInput = document.querySelector('#btc-input');
+        let usdInput = document.querySelector('#usd-input');
+        let value = 0;
+        if(event.srcElement == btcInput)
+        {
+            value = Number(btcInput.value) * Number(this.currencies.BTC);
+            usdInput.value = value;
+        }else{
+            value = Number(usdInput.value) / Number(this.currencies.BTC);
+            btcInput.value = value;
+        }
+    },
+    onCurrencyComplete(data) {
+         try {
+            data = JSON.parse(data);
+        } catch (e) {
+            return;
+        }
+        this.currencies.BTC = this.replaceSign(data.price,'$');
+        document.querySelector('#loading').classList.add('hide');
     },
     onRealtimeComplete(data) {
         try {
@@ -104,9 +133,27 @@ const Main = {
                 break;
         }
     },
+    replaceSpecialChars(name) {
+        name = name.replace(/\./g, '-');
+        name = name.replace(/\s/g, '-');
+        name = name.replace(/\//g, '-');
+        name = name.replace(/\//g, '-');
+        return name;
+    },
+    getlastpartOfLink(link) {
+        let arr = link.split('/');
+        let part = arr[arr.length - 1].trim().indexOf('') >= 0 ? arr[arr.length - 2] : arr[arr.length - 1];
+        return part.toLowerCase();
+    },
     mapRealtimeData(data) {
         this.cheapCoinData.forEach((item) => {
-            let realtimeItem = data[item.symbol];
+            let realtimeItem = data[this.getlastpartOfLink(item.link)];
+            if (!realtimeItem) {
+                //accelerator-network /currencies/accelerator-network/
+                //if(item.symbol == 'ACC')console.log(this.getlastpartOfLink(item.link),item.link);
+                // console.log('didnt find',item.link);
+                return;
+            }
             var sum = null;
             var sumForShort = null;
             let shortTermChange = [];
@@ -118,7 +165,7 @@ const Main = {
                 } else {
                     sum += price;
                 }
-                if (index < 4) {
+                if (index < 15) {
                     sumForShort += price;
                     shortTermChange.push(price);
                 }
@@ -131,8 +178,8 @@ const Main = {
             item.realtimeChange = change + '%';
             item.change15Mins = this.get15minChange(sumForShort, shortTermChange);
             item.direction15Mins = this.get15minDirection(shortTermChange);
-            item.recommendation = this.getRecommendation(item.direction15Mins, item.change15Mins, item.realtimeChange);
-            if (item.recommendation === (RecommendationController.TYPE.STRONG_BUY || RecommendationController.TYPE.BUY)) RecommendationController.addRecommendations(item, item.realtimeChange, item.change15Mins, item.recommendation);
+            item.recommendation = this.getRecommendation(item.direction15Mins, item.change15Mins, item.realtimeChange, item);
+            RecommendationController.addRecommendations(item, item.realtimeChange, item.change15Mins, item.recommendation);
         });
     },
     populateCheapCoins(data) {
@@ -167,16 +214,16 @@ const Main = {
         document.querySelector('#loading').classList.add('hide');
         document.querySelector('#coins_date').textContent = new Date();
     },
-    findCoinInData(symbol){
+    findCoinInData(symbol) {
         let obj;
         this.cheapCoinData.forEach((item) => {
-            if(item.symbol == symbol)obj=item;
+            if (item.symbol == symbol) obj = item;
         });
         return obj;
     },
     replaceSign(price, sign) {
         if (!sign) sign = '%';
-        return Number(price.replace('%', ''));
+        return Number(price.replace(sign, ''));
     },
     getPercentageCellColor(num) {
         return this.replaceSign(num) < 0 ? 'table-danger' : (this.replaceSign(num) > 0 ? 'table-success' : '');
@@ -199,38 +246,43 @@ const Main = {
             if (previousPrice < price) raise++;
             previousPrice = price;
         });
-        if (raise > falls) direction = 'RAISE';
-        if (raise < falls) direction = 'FALL';
+        if (raise > falls && collection[0] >= collection[1]) direction = 'RAISE';
+        if (raise < falls && collection[0] < collection[1]) direction = 'FALL';
         return direction;
     },
     sortBy15mins(data) {
-        let raiseCollection = data.filter((item)=>{
-            if(item.direction15Mins === 'RAISE')return true;
+        let raiseCollection = data.filter((item) => {
+            if (item.direction15Mins === 'RAISE') return true;
         });
-        let nonRaiseCollection = data.filter((item)=>{
-            if(item.direction15Mins !== 'RAISE')return true;
+        let nonRaiseCollection = data.filter((item) => {
+            if (item.direction15Mins !== 'RAISE') return true;
         });
-        raiseCollection.sort((itemA, itemB)=>{
+        raiseCollection.sort((itemA, itemB) => {
             return this.replaceSign(itemB.change15Mins) - this.replaceSign(itemA.change15Mins);
         });
-        nonRaiseCollection.sort((itemA, itemB)=>{
+        nonRaiseCollection.sort((itemA, itemB) => {
             return this.replaceSign(itemB.change15Mins) - this.replaceSign(itemA.change15Mins);
         });
         data = raiseCollection.concat(nonRaiseCollection);
         return data;
     },
-    getRecommendation(direction, change15Mins, changeRealtime) {
+    getRecommendation(direction, change15Mins, changeRealtime, item) {
         change15Mins = this.replaceSign(change15Mins);
         changeRealtime = this.replaceSign(changeRealtime);
+        let change24 = this.replaceSign(item.percent_24h);
+        let change7 = this.replaceSign(item.percent_7d);
         let type = '';
-        if (RecommendationController.bestChange15 && this.between(changeRealtime, RecommendationController.bestChange1h, 1, 1) && this.between(change15Mins, RecommendationController.bestChange15) && direction === 'RAISE') {
+        //if (RecommendationController.bestChange15 && this.between(changeRealtime, RecommendationController.bestChange1h, 5, 5) && this.between(change15Mins, RecommendationController.bestChange15) && this.between(change24, RecommendationController.bestChange24, 5, 5) && change7 < 0 && direction === 'RAISE') {
+            if (RecommendationController.bestChange15 && this.between(changeRealtime, RecommendationController.bestChange1h, 5, 5) && this.between(change15Mins, RecommendationController.bestChange15)  && change24 <= RecommendationController.bestChange24 && change7 < RecommendationController.bestChange7 && direction === 'RAISE') {
             type = 'STRONG BUY';
-        } else if (!RecommendationController.bestChange15 && this.between(changeRealtime, 1, 1) && this.between(change15Mins, 24,5,2) && direction === 'RAISE') {
+        } else if (changeRealtime > 5 && change15Mins > 5 && change24 < -20 && change7 < -20 && direction === 'RAISE') {
             type = 'STRONG BUY';
-        } else if (changeRealtime && change15Mins && direction === 'RAISE') {
+        } else if (changeRealtime > 5 && change15Mins > 5 && change24 < 0 && change7 < 0 && direction === 'RAISE') {
             type = 'BUY';
+        } else if (changeRealtime > 1 && change15Mins > 5 && change7 < 0 && direction === 'RAISE') {
+            type = 'POTENTIAL';
         } else if (changeRealtime && change15Mins && direction === 'NO CHANGE') {
-            type = 'BUY';
+            //type = 'BUY';
         } else if (change15Mins && (direction === 'NO CHANGE' || direction === 'RAISE')) {}
         return type;
     },

@@ -57,10 +57,13 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#" id="main-button">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="#" id="main-button">Cheap Coins <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="rec-button">Recommendation Tracker</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-toggle="modal" data-target="#currency-model" id="currency-button">Currency Converter</a>
                 </li>
             </ul>
         </div>
@@ -68,10 +71,10 @@
     <div class="container-fluid hide" page="main">
         <div class="card bg-dark text-white" style="background: url(image/hero.png) center center;text-shadow: 1px 1px 2px black; ">
             <div class="card-body">
-                <h1 class="display-6">Crypto Trade Recommendations</h1>
+                <h1 class="display-6">Cheap Coins</h1>
                 <p class="lead">Sorted by reccommendation and a positive percentage change within the last 15 minutes.
                     <br>Search <a href="www.coinmarketcap.com" target="_blank" class="text-white">www.coinmarketcap.com</a> for the exchanges and stats.</p>
-                <p>Content up update <strong>every</strong> minute.</p>
+                <p>Content update <strong>every</strong> minute.</p>
                 <h6 class="card-subtitle mb-2 text-light">Last Updated <span id="coins_date"></span></h6>
             </div>
         </div>
@@ -86,7 +89,7 @@
                         <th>Change (1h)</th>
                         <th>Change (24h)</th>
                         <th>Change (7d)</th>
-                        <th>Realtime Change (1h)</th>
+                        <th>Realtime Change</th>
                         <th>Realtime Change (15mins)</th>
                         <th>Realtime Direction (15mins)</th>
                         <th>Price</th>
@@ -132,6 +135,12 @@
                         <button type="button" class="btn btn-info">
                             Average Change (1h) <span class="badge badge-light" id="best_average_1h"></span>
                         </button>
+                        <button type="button" class="btn btn-info">
+                            Average Change (24h) <span class="badge badge-light" id="best_average_24h"></span>
+                        </button>
+                        <button type="button" class="btn btn-info">
+                            Average Change (7d) <span class="badge badge-light" id="best_average_7d"></span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -139,15 +148,43 @@
         <div id="recommendation-card-container">
         </div>
     </div>
-    <div id="loading">
-        <div class="spinner">
-                <div class="rect1"></div>
-                <div class="rect2"></div>
-                <div class="rect3"></div>
-                <div class="rect4"></div>
-                <div class="rect5"></div>
+    <div class="modal fade" id="currency-model" tabindex="-1" role="dialog" aria-labelledby="currency-model" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Convert BTC to USD</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">BTC</span>
+                            </div>
+                            <input type="text" class="form-control" id="btc-input" aria-describedby="btc" placeholder="BTC">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">USD</span>
+                            </div>
+                             <input type="text" class="form-control" id="usd-input" aria-describedby="usd" placeholder="USD">
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
+    <div id="loading">
+        <div class="spinner">
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+        </div>
+    </div>
     </div>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-112382612-1"></script>

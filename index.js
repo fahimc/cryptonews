@@ -12,7 +12,7 @@ app.get('/', function(req, res) {
 app.set('port', port);
 
 const Main = {
-    PULL_DELAY: (60000 * 5),
+    PULL_DELAY: (60000 * 1),
     currentSaveIndex: 0,
     init() {
         CoinMarketCap.getAllCoins(this.onComplete.bind(this));
@@ -21,6 +21,10 @@ const Main = {
         });
     },
     onComplete(data) {
+        if(!data){
+            this.next();
+            return;
+        }
         this.saveIndividualCoins(data);
         let cheapData = CoinMarketCap.findCheapCoinsMovingUp(data);
         this.saveRealtimeChanges(cheapData);
@@ -40,11 +44,23 @@ const Main = {
             return;
         }
         let item = data[this.currentSaveIndex];
-        fs.writeFile(`dist/data/coin/${item.symbol}.json`, JSON.stringify(item, null, 2), (err) => {
+        fs.writeFile(`dist/data/coin/${this.getlastpartOfLink(item.link)}.json`, JSON.stringify(item, null, 2), (err) => {
             if (err) throw err;
             this.currentSaveIndex++;
             this.saveNext(data);
         });
+    },
+    replaceSpecialChars(name){
+        name = name.replace(/\./g,'-');
+        name =  name.replace(/\s/g,'-');
+        name =  name.replace(/\//g,'-');
+        name =  name.replace(/\//g,'-');
+        return name;
+    },
+    getlastpartOfLink(link){
+        let arr =  link.split('/');
+        let part = arr[arr.length-1].trim().indexOf('') >= 0 ? arr[arr.length-2] : arr[arr.length-1];
+        return part.toLowerCase();
     },
     saveRealtimeChanges(data) {
         let filePath = "dist/data/realtime_changes.json";
@@ -56,12 +72,15 @@ const Main = {
 
         }
         data.forEach((dataItem) => {
-            let item = content[dataItem.symbol];
-            let maxHourCount = 12;
+            let key = this.getlastpartOfLink(dataItem.link);
+            // /console.log(key);
+            let item = content[key];
+            let maxHourCount = 60;
             if (!item) {
                 item = {
                     symbol: dataItem.symbol,
                     name: dataItem.name,
+                    link:dataItem.link,
                     priceHistory: []
                 }
             }
@@ -72,13 +91,14 @@ const Main = {
             if (item.priceHistory.length > maxHourCount) {
                 item.priceHistory.pop();
             }
-            content[dataItem.symbol] = item;
+            content[key] = item;
         });
         fs.writeFile(filePath, JSON.stringify(content, null, 2), (err) => {
             if (err) throw err;
             console.log('saved realtime data');
         });
     },
+    
     next() {
         setTimeout(() => {
             CoinMarketCap.getAllCoins(this.onComplete.bind(this));

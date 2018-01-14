@@ -3,6 +3,11 @@ const fs = require("fs");
 const CoinMarketCap = {
     getAllCoins(callback) {
         cheerio("https://coinmarketcap.com/all/views/all/", (err, $) => {
+            if(err)
+            {
+                 if (callback) callback(null);
+                return;
+            }
             let data = [];
             let rows = $('tr').each((i, elem) => {
                 let item = {};
@@ -45,7 +50,7 @@ const CoinMarketCap = {
         data.forEach((item) => {
             let price = Number(item.price.replace('$', ''));
             let change = Number(item.percent_1h.replace('%', ''));
-            if (price < 0.01 && change > 0.3) {
+            if (price < 0.01) {
                 cheapCoins.push(item);
             }
         });
