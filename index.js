@@ -1,4 +1,4 @@
-let CoinMarketCap = require('./getAllCoins.js');
+let CoinMarketCap = require('./coinmarketcap.js');
 let fs = require('fs');
 let path = require('path');
 var express = require('express');
@@ -28,6 +28,7 @@ const Main = {
         this.saveIndividualCoins(data);
         let cheapData = CoinMarketCap.findCheapCoinsMovingUp(data);
         this.saveRealtimeChanges(cheapData);
+        CoinMarketCap.getNewCoins(this.saveNewCoins.bind(this));
         fs.writeFile('dist/data/cheapcoins_1h.json', JSON.stringify(cheapData, null, 2), (err) => {
             if (err) throw err;
             console.log('saved cheap coins');
@@ -48,6 +49,11 @@ const Main = {
             if (err) throw err;
             this.currentSaveIndex++;
             this.saveNext(data);
+        });
+    },
+    saveNewCoins(data){
+        fs.writeFile(`dist/data/newcoins.json`, JSON.stringify(data, null, 2), (err) => {
+            if (err) throw err;
         });
     },
     replaceSpecialChars(name){

@@ -38,6 +38,45 @@ const CoinMarketCap = {
             if (callback) callback(data);
         });
     },
+    getNewCoins(callback) {
+        console.log('getNewCoins');
+        cheerio("https://coinmarketcap.com/new/", (err, $) => {
+            if(err)
+            {
+                 if (callback) callback(null);
+                return;
+            }
+            let data = [];
+            let rows = $('tr').each((i, elem) => {
+                let item = {};
+                let symbol = $(elem).find('td:nth-child(2)').text().replace(/\n/g, '').trim();
+                if (!symbol) return;
+                let name = $(elem).find('td.currency-name').text().replace(/\n/g, '').trim();
+                let link = $(elem).find('td.currency-name a').attr('href').replace(/\n/g, '').trim();
+                let marketCap = $(elem).find('td:nth-child(4)').text().replace(/\n/g, '').trim();
+                let price = $(elem).find('td:nth-child(5)').text().replace(/\n/g, '').trim();
+                let volume = $(elem).find('td:nth-child(7)').text().replace(/\n/g, '').trim();
+                let supply = $(elem).find('td:nth-child(6)').text().replace(/\n|\s/g, '').trim();
+                let percent_24h = $(elem).find('td:nth-child(8)').text().replace(/\n/g, '').trim();
+                let added = $(elem).find('td:nth-child(3)').text().replace(/\n/g, '').trim();
+               
+                item = {
+                    name,
+                    symbol,
+                    marketCap,
+                    added,
+                    price,
+                    volume,
+                    supply,
+                    percent_24h,
+                    link: link
+                };
+                if(added == 'Today' || added == '1 day ago')data.push(item);
+            });
+
+            if (callback) callback(data);
+        });
+    },
     sortCoins1hChange(data) {
         data.sort((a, b) => {
             return Number(b.percent_1h.replace('%', '')) - Number(a.percent_1h.replace('%', ''));
@@ -57,5 +96,4 @@ const CoinMarketCap = {
         return cheapCoins;
     }
 };
-
 module.exports = CoinMarketCap;
