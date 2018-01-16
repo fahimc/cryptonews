@@ -9,7 +9,7 @@ const Main = {
         document.addEventListener('DOMContentLoaded', this.onLoaded.bind(this));
     },
     onLoaded() {
-        this.loadFile('data/newcoins.json', this.onComplete.bind(this));
+        this.loadFile('data/news.json', this.onComplete.bind(this));
     },
     loadFile(url, callback, ignoreRetry) {
         var xobj = new XMLHttpRequest();
@@ -37,15 +37,8 @@ const Main = {
         data.forEach((item) => {
             console.log(item);
             let row = document.createElement('TR');
-            let class_24h = Main.getPercentageCellColor(item.percent_24h);
-            let content = `<td><a class="text-white" href="//coinmarketcap.com/${item.link}" target="_blank" >${item.name}</a></td>
-            <td>${item.symbol}</td>
-            <td>${item.marketCap}</td>
-            <td>${item.volume}</td>
-            <td>${item.added}</td>
-            <td>${item.supply}</td>
-            <td class="${class_24h}">${item.percent_24h}</td>
-            <td>${item.price}</td>`;
+            let content = `<td><a class="text-white" href="${item.link}" target="_blank" >${item.title}</a></td>
+            <td>${item.sentiment}</td>`;
             row.innerHTML = content;
 
             tbody.appendChild(row);
