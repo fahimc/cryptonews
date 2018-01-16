@@ -1,4 +1,5 @@
 let CoinMarketCap = require('./coinmarketcap.js');
+let GoogleNewsService = require('./src/news/google-news.js');
 let fs = require('fs');
 let path = require('path');
 var express = require('express');
@@ -15,6 +16,7 @@ const Main = {
     PULL_DELAY: (60000 * 1),
     currentSaveIndex: 0,
     init() {
+        GoogleNewsService.init();
         CoinMarketCap.getAllCoins(this.onComplete.bind(this));
         http.listen(port, function() {
             console.log('listening on *:' + port);

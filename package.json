@@ -7,7 +7,9 @@
     "cheerio": "^1.0.0-rc.2",
     "cheerio-req": "^1.2.2",
     "express": "^4.15.2",
-    "nodemon": "^1.14.10"
+    "google-news": "^1.4.6",
+    "nodemon": "^1.14.10",
+    "sentiment-analysis": "^0.1.2"
   },
   "devDependencies": {},
   "scripts": {
