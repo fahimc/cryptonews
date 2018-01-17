@@ -17,6 +17,9 @@
 .jumbotron .container {
   max-width: 40rem;
 }
+.jumbotron .btn{
+      white-space: normal; 
+}
 .grid{
   margin-top: 20px;
 }
