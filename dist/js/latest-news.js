@@ -11,6 +11,7 @@ const Main = {
         document.addEventListener('DOMContentLoaded', this.onLoaded.bind(this));
     },
     onLoaded() {
+        document.querySelector('#loading').classList.remove('hide');
         this.loadFile('data/news.json', this.onComplete.bind(this));
     },
     loadFile(url, callback, ignoreRetry) {
@@ -32,6 +33,7 @@ const Main = {
      onComplete(data) {
         data = JSON.parse(data);
         this.populateTable(data);
+        this.run();
     },
     populateTable(data) {
         let tbody = document.querySelector('tbody');
@@ -62,7 +64,9 @@ const Main = {
     getPercentageCellColor(num) {
         return this.replaceSign(num) < 0 ? 'table-danger' : (this.replaceSign(num) > 0 ? 'table-success' : '');
     },
-   
+    run(){
+        setTimeout(this.onLoaded.bind(this),60000);
+    }
 };
 
 Main.init();

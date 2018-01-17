@@ -5,7 +5,7 @@ let path = require('path');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 8080;
 app.use(express.static('dist'))
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/dist/index.html');
@@ -23,11 +23,12 @@ const Main = {
         });
     },
     onComplete(data) {
-        if(!data){
+        if (!data) {
             this.next();
             return;
         }
         this.saveIndividualCoins(data);
+        this.saveListOfAllCoins(data);
         let cheapData = CoinMarketCap.findCheapCoinsMovingUp(data);
         this.saveRealtimeChanges(cheapData);
         CoinMarketCap.getNewCoins(this.saveNewCoins.bind(this));
@@ -37,12 +38,18 @@ const Main = {
             this.next();
         });
     },
+    saveListOfAllCoins(data) {
+        fs.writeFile('dist/data/all_coins.json', JSON.stringify(data, null, 2), (err) => {
+            if (err) throw err;
+            console.log('saved all coins');
+        });
+    },
     saveIndividualCoins(data) {
         this.saveNext(data);
     },
     saveNext(data) {
         if (this.currentSaveIndex > data.length - 1) {
-            this.currentSaveIndex=0;
+            this.currentSaveIndex = 0;
             console.log('saved all inidividual coins');
             return;
         }
@@ -53,21 +60,21 @@ const Main = {
             this.saveNext(data);
         });
     },
-    saveNewCoins(data){
+    saveNewCoins(data) {
         fs.writeFile(`dist/data/newcoins.json`, JSON.stringify(data, null, 2), (err) => {
             if (err) throw err;
         });
     },
-    replaceSpecialChars(name){
-        name = name.replace(/\./g,'-');
-        name =  name.replace(/\s/g,'-');
-        name =  name.replace(/\//g,'-');
-        name =  name.replace(/\//g,'-');
+    replaceSpecialChars(name) {
+        name = name.replace(/\./g, '-');
+        name = name.replace(/\s/g, '-');
+        name = name.replace(/\//g, '-');
+        name = name.replace(/\//g, '-');
         return name;
     },
-    getlastpartOfLink(link){
-        let arr =  link.split('/');
-        let part = arr[arr.length-1].trim().indexOf('') >= 0 ? arr[arr.length-2] : arr[arr.length-1];
+    getlastpartOfLink(link) {
+        let arr = link.split('/');
+        let part = arr[arr.length - 1].trim().indexOf('') >= 0 ? arr[arr.length - 2] : arr[arr.length - 1];
         return part.toLowerCase();
     },
     saveRealtimeChanges(data) {
@@ -88,7 +95,7 @@ const Main = {
                 item = {
                     symbol: dataItem.symbol,
                     name: dataItem.name,
-                    link:dataItem.link,
+                    link: dataItem.link,
                     priceHistory: []
                 }
             }
@@ -106,7 +113,7 @@ const Main = {
             console.log('saved realtime data');
         });
     },
-    
+
     next() {
         setTimeout(() => {
             CoinMarketCap.getAllCoins(this.onComplete.bind(this));
