@@ -5,6 +5,8 @@ const Main = {
     currencies: {
         BTC: 0
     },
+    negativeCount:0,
+    positiveCount:0,
     init() {
         document.addEventListener('DOMContentLoaded', this.onLoaded.bind(this));
     },
@@ -35,14 +37,22 @@ const Main = {
         let tbody = document.querySelector('tbody');
         tbody.innerHTML = '';
         data.forEach((item) => {
-            console.log(item);
+            
             let row = document.createElement('TR');
-            let content = `<td><a class="text-white" href="${item.link}" target="_blank" >${item.title}</a></td>
+
+            let cellClass =  item.sentiment > 0 ? 'table-success' : (item.sentiment < 0 ? 'table-danger' : 'normal');
+             row.classList.add(cellClass);
+            let content = `<td><a class="text-white" href="${item.item.link}" target="_blank" >${item.title}</a></td>
             <td>${item.sentiment}</td>`;
             row.innerHTML = content;
 
             tbody.appendChild(row);
+
+            if(item.sentiment < 0)this.negativeCount++;
+            if(item.sentiment > 0)this.positiveCount++;
         });
+        document.querySelector('#positive').textContent = this.positiveCount;
+        document.querySelector('#negative').textContent = this.negativeCount;
         document.querySelector('#loading').classList.add('hide');
     },
     replaceSign(price, sign) {

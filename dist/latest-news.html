@@ -46,7 +46,7 @@
 
 <body class="bg-dark">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark text-white sticky-top">
-        <a class="navbar-brand text-white logo " href="#">
+        <a class="navbar-brand text-white logo " href="index.html">
               <img src="image/cryptonitex_logo.png" class="logo">
               <span>cryptonitex<span>
               </a>
@@ -55,8 +55,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item active">
-                    <a class="nav-link" href="index.html" id="main-button">Cheap Coins <span class="sr-only">(current)</span></a>
+                <li class="nav-item ">
+                    <a class="nav-link" href="index.html" id="main-button">Cheap Coins</a>
+                </li>
+                 <li class="nav-item">
+                   <a class="nav-link" href="new-coins.html" id="rec-button">New Coins</a>
+                </li>
+                 <li class="nav-item active">
+                   <a class="nav-link" href="latest-news.html" id="rec-button">Latest News <span class="sr-only">(current)</span></a>
                 </li>
             </ul>
         </div>
@@ -65,9 +71,20 @@
         <div class="card bg-dark text-white" style="background: url(image/hero.png) center center;text-shadow: 1px 1px 2px black; ">
             <div class="card-body">
                 <h1 class="display-6">Latest News</h1>
-                <p class="lead"</p>
             </div>
         </div>
+        <div class="card text-white bg-dark border-0">
+                    <div class="card-header bg-dark ">Sentiment Analysis</div>
+                    <div class="card-body">
+                        <p><small>Below is the sentiment analysis result. Some articles may have not been found correctly.</small></p>
+                        <button type="button" class="btn btn-success">
+                            Number of Positive stories <span class="badge badge-light" id="positive"></span>
+                        </button>
+                        <button type="button" class="btn btn-danger">
+                            Number of Negative stories <span class="badge badge-light" id="negative"></span>
+                        </button>
+                    </div>
+                </div>
         <div class="table-responsive">
             <table class="table table-dark table-striped table-hover table-sm">
                 <thead class="thead">

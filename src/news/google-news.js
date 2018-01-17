@@ -7,7 +7,8 @@ const GoogleNewsService = {
     collection:[],
     SEARCH_TERMS: [
         'bitcoin',
-        'cryptocurrency'
+        'cryptocurrency',
+        'ripple xrp'
     ],
     init() {
         googleNews = new GoogleNews();
