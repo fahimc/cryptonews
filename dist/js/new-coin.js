@@ -41,11 +41,12 @@ const Main = {
             let content = `<td><a class="text-white" href="//coinmarketcap.com/${item.link}" target="_blank" >${item.name}</a></td>
             <td>${item.symbol}</td>
             <td>${item.marketCap}</td>
-            <td>${item.volume}</td>
             <td>${item.added}</td>
+            <td>${item.price}</td>
+            <td>${item.volume}</td>
             <td>${item.supply}</td>
             <td class="${class_24h}">${item.percent_24h}</td>
-            <td>${item.price}</td>`;
+            `;
             row.innerHTML = content;
 
             tbody.appendChild(row);
