@@ -38,10 +38,12 @@
     <meta name='apple-mobile-web-app-status-bar-style' content='black'>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/research.css">
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="js/latest-news.js"></script>
+    <script type="text/javascript" src="js/lib/tabletop.min.js"></script>
+    <script type="text/javascript" src="js/research.js"></script>
 </head>
 
 <body class="bg-dark">
@@ -56,49 +58,32 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                 <li class="nav-item ">
-                    <a class="nav-link" href="index.html" id="main-button">Cheap Coins</a>
-                </li>
-                 <li class="nav-item">
-                   <a class="nav-link" href="new-coins.html" id="rec-button">New Coins</a>
-                </li>
-                 <li class="nav-item active">
-                   <a class="nav-link" href="latest-news.html" id="rec-button">Latest News <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="index.html" id="main-button">Cheap Coins </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="researched-coins.html" id="rec-button">Coins to Watch</a>
+                    <a class="nav-link" href="new-coins.html" id="rec-button">New Coins</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="latest-news.html" id="rec-button">Latest News</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="researched-coins.html" id="rec-button">Coins to Watch<span class="sr-only">(current)</span></a>
                 </li>
             </ul>
         </div>
     </nav>
     <div class="container-fluid" page="main">
-        <div class="card bg-dark text-white" style="background: url(image/hero.png) center center;text-shadow: 1px 1px 2px black; ">
-            <div class="card-body">
-                <h1 class="display-6">Latest News</h1>
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h1 class="jumbotron-heading">Coins to Watch</h1>
+                <p class="lead text-muted">Here is a list of coins that have been research and found by the Cryptonitex community.</p>
+                <p><a class="btn btn-lg btn-success" href="https://goo.gl/forms/q1L0W8FZ2bqeGFSq1" target="_blank" role="button">Share a coin with the community</a></p>
             </div>
-        </div>
-        <div class="card text-white bg-dark border-0">
-                    <div class="card-header bg-dark ">Sentiment Analysis</div>
-                    <div class="card-body">
-                        <p><small>Below is the sentiment analysis result. Some articles may have not been found correctly.</small></p>
-                        <button type="button" class="btn btn-success">
-                            Number of Positive stories <span class="badge badge-light" id="positive"></span>
-                        </button>
-                        <button type="button" class="btn btn-danger">
-                            Number of Negative stories <span class="badge badge-light" id="negative"></span>
-                        </button>
-                    </div>
-                </div>
-        <div class="table-responsive">
-            <table class="table table-dark table-striped table-hover table-sm">
-                <thead class="thead">
-                    <tr>
-                        <th>Title</th>
-                        <th>Sentiment Analysis</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+        </section>
+        <div class="container grid ">
+            <div class="row">
+                
+            </div>
         </div>
     </div>
     <div id="loading">

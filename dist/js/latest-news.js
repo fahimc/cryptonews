@@ -31,6 +31,8 @@ const Main = {
 
     },
      onComplete(data) {
+        this.negativeCount=0;
+        this.positiveCount=0;
         data = JSON.parse(data);
         this.populateTable(data);
         this.run();

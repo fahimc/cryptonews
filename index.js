@@ -29,6 +29,7 @@ const Main = {
         }
         this.saveIndividualCoins(data);
         this.saveListOfAllCoins(data);
+        this.saveListOfAllCoinsSlim(data);
         let cheapData = CoinMarketCap.findCheapCoinsMovingUp(data);
         this.saveRealtimeChanges(cheapData);
         CoinMarketCap.getNewCoins(this.saveNewCoins.bind(this));
@@ -44,6 +45,20 @@ const Main = {
             console.log('saved all coins');
         });
     },
+    saveListOfAllCoinsSlim(data) {
+        let collection = [];
+        data.forEach((item)=>{
+            collection.push({
+            name:item.name,
+            symbol:item.symbol,
+            price:item.price
+         });
+        });
+        fs.writeFile('dist/data/coin_list.json', JSON.stringify(collection, null, 2), (err) => {
+            if (err) throw err;
+            console.log('saved all coins');
+        });
+    },
     saveIndividualCoins(data) {
         this.saveNext(data);
     },
@@ -54,7 +69,8 @@ const Main = {
             return;
         }
         let item = data[this.currentSaveIndex];
-        fs.writeFile(`dist/data/coin/${this.getlastpartOfLink(item.link)}.json`, JSON.stringify(item, null, 2), (err) => {
+        let fileName = this.getlastpartOfLink(item.link);
+        fs.writeFile(`dist/data/coin/${fileName}.json`, JSON.stringify(item, null, 2), (err) => {
             if (err) throw err;
             this.currentSaveIndex++;
             this.saveNext(data);

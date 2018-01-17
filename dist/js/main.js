@@ -22,7 +22,9 @@ const Main = {
             this.loadFile('data/coin/bitcoin.json',this.onCurrencyComplete.bind(this),true);
         });
         document.querySelector('#btc-input').addEventListener('keyup', this.onCurrencyKeyUp.bind(this));
+        document.querySelector('#btc-input').addEventListener('paste', this.onCurrencyKeyUp.bind(this));
         document.querySelector('#usd-input').addEventListener('keyup', this.onCurrencyKeyUp.bind(this));
+        document.querySelector('#usd-input').addEventListener('paste', this.onCurrencyKeyUp.bind(this));
 
     },
     loadCheapCoins() {

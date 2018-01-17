@@ -43,7 +43,7 @@ const CoinMarketCap = {
         cheerio("https://coinmarketcap.com/new/", (err, $) => {
             if(err)
             {
-                 if (callback) callback(null);
+                 if (callback) callback([]);
                 return;
             }
             let data = [];
