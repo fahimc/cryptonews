@@ -4,11 +4,12 @@ let sentimentAnalysis = require('sentiment-analysis');
 let googleNews;
 
 const GoogleNewsService = {
-    collection:[],
+    collection: [],
     SEARCH_TERMS: [
         'bitcoin',
         'cryptocurrency',
-        'ripple xrp'
+        'ripple xrp',
+        'ethereum'
     ],
     init() {
         googleNews = new GoogleNews();
@@ -26,28 +27,45 @@ const GoogleNewsService = {
     },
     onData(data) {
         this.collection.push({
-            title:data.title,
-            item:data,
-            sentiment:sentimentAnalysis(data.title)
+            title: data.title,
+            item: data,
+            sentiment: sentimentAnalysis(data.title)
         });
     },
     onError(error) {
-         //console.log('Error Event received... ' + error);
+        //console.log('Error Event received... ' + error);
     },
-    run(firstTime){
-        setTimeout(this.saveData.bind(this),firstTime?3000:60000);
+    run(firstTime) {
+        setTimeout(this.saveData.bind(this), firstTime ? 3000 : 60000);
     },
-    saveData(){
-        if(!this.collection.length) {
+    saveData() {
+        if (!this.collection.length) {
             this.run();
             return;
         }
+        this.collection.sort((itemA,itemB)=>{
+                if(new Date(itemB.item.date) > new Date(itemA.item.date))return true;
+        });
         fs.writeFile(`dist/data/news.json`, JSON.stringify(this.collection, null, 2), (err) => {
             if (err) throw err;
-            this.collection = [];
+            this.removeOldArticles();
+            //this.collection = [];
             this.run();
             console.log('saved news');
         });
+    },
+    removeOldArticles() {
+        let date = new Date();
+        var timestamp = new Date().getTime() - (1 * 24 * 60 * 60 * 1000);
+        for (let a = 0; a < this.collection.length; ++a) {
+            let item = this.collection[a];
+            let itemTimestamp = new Date(item.item.date).getTime();
+            if (itemTimestamp < timestamp) {
+                this.collection.splice(a, 1);
+                a--;
+            }
+
+        }
     }
 };
 

@@ -41,8 +41,8 @@ const Main = {
             let row = document.createElement('TR');
 
             let cellClass =  item.sentiment > 0 ? 'table-success' : (item.sentiment < 0 ? 'table-danger' : 'normal');
-             row.classList.add(cellClass);
-            let content = `<td><a class="text-white" href="${item.item.link}" target="_blank" >${item.title}</a></td>
+            row.classList.add(cellClass);
+            let content = `<td><a class="text-white" href="${item.item.link}" target="_blank" >${item.title}</a><br><small>${new Date(item.item.date)}</small></td>
             <td>${item.sentiment}</td>`;
             row.innerHTML = content;
 
