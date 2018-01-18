@@ -50,9 +50,12 @@ const Main = {
         }
     },
     onChange(event) {
+        let btcInput = document.querySelector('#btc-input');
+        let usdInput = document.querySelector('#usd-input');
         this.currentCurrency = this.data[this.selectElement.selectedIndex];
         document.querySelector('#btc-input').placeholder = this.currentCurrency.symbol;
-        console.log(this.currentCurrency);
+       btcInput.value = ' ';
+       usdInput.value = ' ';
     },
     onComplete(data) {
         this.data = JSON.parse(data);
