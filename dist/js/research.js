@@ -20,6 +20,7 @@ const Main = {
     },
     onComplete(data) {
         let tr = document.querySelector('.row');
+        data.reverse();
         data.forEach((item) => {
         console.log(item);
 
