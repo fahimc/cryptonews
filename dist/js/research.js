@@ -19,22 +19,22 @@ const Main = {
         })
     },
     onComplete(data) {
-        console.log(data);
         let tr = document.querySelector('.row');
         data.forEach((item) => {
+        console.log(item);
 
             let template = `<div class="col-lg-4 ">
                     <div class="card bg-light" >
                     <div class="card-body">
                     <h5>${item.Name} <span class="badge badge-dark text-white">${item.Symbol}</span></h5>
                     <small>${item.Timestamp}</small>
-                    <p>Its aimed for the residence of Portugal. It creates a fund to get them out of debt.</p>
+                    <p>${item['Whats you opinion?']}</p>
                     <div class="list-group text-white">
                     <a href="#" class="list-group-item list-group-item-action flex-column align-items-start ">
                             <div class="d-flex w-100 justify-content-between">
                                 <small>Initial Price</small>
                             </div>
-                            <p class="mb-1">$0.0002730</p>
+                            <p class="mb-1">$${item['Price (at present)']}</p>
                         </a>
                         <a href="#" class="list-group-item list-group-item-action flex-column align-items-start ">
                             <div class="d-flex w-100 justify-content-between">
