@@ -32,6 +32,9 @@
     background-color: #e67e22;
     color: #FFF;
 }
+.btn{
+      white-space: normal; 
+}
 
 [page].hide {
     display: none;
@@ -44,12 +47,13 @@
 
 
 #loading {
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 9999;
+        z-index: 1019;
+    background-color: rgba(0,0,0,0.5);
 }
 
 #loading.hide {

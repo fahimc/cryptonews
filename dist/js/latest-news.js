@@ -5,8 +5,8 @@ const Main = {
     currencies: {
         BTC: 0
     },
-    negativeCount:0,
-    positiveCount:0,
+    negativeCount: 0,
+    positiveCount: 0,
     init() {
         document.addEventListener('DOMContentLoaded', this.onLoaded.bind(this));
     },
@@ -30,29 +30,31 @@ const Main = {
         }
 
     },
-     onComplete(data) {
+    onComplete(data) {
 
-        this.negativeCount=0;
-        this.positiveCount=0;
-         try {
-           data = JSON.parse(data);
+        this.negativeCount = 0;
+        this.positiveCount = 0;
+        try {
+            data = JSON.parse(data);
         } catch (e) {
             document.querySelector('#loading').classList.add('hide');
             this.onLoaded();
             return;
         }
-        
+
         this.populateTable(data);
         this.run();
     },
     populateTable(data) {
         let tbody = document.querySelector('tbody');
         tbody.innerHTML = '';
+        console.log(data);
+        data.sort(this.sortByDate);
         data.forEach((item) => {
-            
+
             let row = document.createElement('TR');
 
-            let cellClass =  item.sentiment > 0 ? 'table-success' : (item.sentiment < 0 ? 'table-danger' : 'normal');
+            let cellClass = item.sentiment > 0 ? 'table-success' : (item.sentiment < 0 ? 'table-danger' : 'normal');
             row.classList.add(cellClass);
             let content = `<td><a class="text-white" href="${item.item.link}" target="_blank" >${item.title}</a><br><small>${new Date(item.item.date)}</small></td>
             <td>${item.sentiment}</td>`;
@@ -60,12 +62,17 @@ const Main = {
 
             tbody.appendChild(row);
 
-            if(item.sentiment < 0)this.negativeCount++;
-            if(item.sentiment > 0)this.positiveCount++;
+            if (item.sentiment < 0) this.negativeCount++;
+            if (item.sentiment > 0) this.positiveCount++;
         });
         document.querySelector('#positive').textContent = this.positiveCount;
         document.querySelector('#negative').textContent = this.negativeCount;
         document.querySelector('#loading').classList.add('hide');
+    },
+    sortByDate(itemA, itemB) {
+        let itemBDate = new Date(itemB.item.date);
+        let itemADate = new Date(itemA.item.date);
+        return itemBDate - itemADate;
     },
     replaceSign(price, sign) {
         if (!sign) sign = '%';
@@ -74,8 +81,8 @@ const Main = {
     getPercentageCellColor(num) {
         return this.replaceSign(num) < 0 ? 'table-danger' : (this.replaceSign(num) > 0 ? 'table-success' : '');
     },
-    run(){
-        setTimeout(this.onLoaded.bind(this),60000);
+    run() {
+        setTimeout(this.onLoaded.bind(this), 60000);
     }
 };
 

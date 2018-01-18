@@ -58,11 +58,11 @@
                 <li class="nav-item ">
                     <a class="nav-link" href="index.html" id="main-button">Cheap Coins</a>
                 </li>
-                 <li class="nav-item">
-                   <a class="nav-link" href="new-coins.html" id="rec-button">New Coins</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="new-coins.html" id="rec-button">New Coins</a>
                 </li>
-                 <li class="nav-item active">
-                   <a class="nav-link" href="latest-news.html" id="rec-button">Latest News <span class="sr-only">(current)</span></a>
+                <li class="nav-item active">
+                    <a class="nav-link" href="latest-news.html" id="rec-button">Latest News <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="researched-coins.html" id="rec-button">Coins to Watch</a>
@@ -71,23 +71,19 @@
         </div>
     </nav>
     <div class="container-fluid" page="main">
-        <div class="card bg-dark text-white" style="background: url(image/hero.png) center center;text-shadow: 1px 1px 2px black; ">
-            <div class="card-body">
-                <h1 class="display-6">Latest News</h1>
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h1 class="jumbotron-heading">Latest News</h1>
+                <p class="lead text-muted">Below is the latest news articles and refreshes every minute. There is also sentiment analysis results to determine if the market has negivate media coverage or a positive one.</p>
+                <p><small>Some articles may have not been found correctly.</small> </p>
+                <button type="button" class="btn btn-success">
+                    Number of Positive stories <span class="badge badge-light" id="positive"></span>
+                </button>
+                <button type="button" class="btn btn-danger">
+                    Number of Negative stories <span class="badge badge-light" id="negative"></span>
+                </button>
             </div>
-        </div>
-        <div class="card text-white bg-dark border-0">
-                    <div class="card-header bg-dark ">Sentiment Analysis</div>
-                    <div class="card-body">
-                        <p><small>Below is the sentiment analysis result. Some articles may have not been found correctly.</small></p>
-                        <button type="button" class="btn btn-success">
-                            Number of Positive stories <span class="badge badge-light" id="positive"></span>
-                        </button>
-                        <button type="button" class="btn btn-danger">
-                            Number of Negative stories <span class="badge badge-light" id="negative"></span>
-                        </button>
-                    </div>
-                </div>
+        </section>
         <div class="table-responsive">
             <table class="table table-dark table-striped table-hover table-sm">
                 <thead class="thead">
