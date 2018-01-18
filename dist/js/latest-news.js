@@ -31,9 +31,17 @@ const Main = {
 
     },
      onComplete(data) {
+
         this.negativeCount=0;
         this.positiveCount=0;
-        data = JSON.parse(data);
+         try {
+           data = JSON.parse(data);
+        } catch (e) {
+            document.querySelector('#loading').classList.add('hide');
+            this.onLoaded();
+            return;
+        }
+        
         this.populateTable(data);
         this.run();
     },
